@@ -1,4 +1,4 @@
-Part of the Complete Unreal Creator course on Udemy, see [here](https://www.udemy.com/unrealcourse?couponCode=GithubSpecial) for a 
+﻿Part of the Complete Unreal Creator course on Udemy, see [here](https://www.udemy.com/unrealcourse?couponCode=GithubSpecial) for a 
 special Github offer. The ful course is part of
 [this](https://www.kickstarter.com/projects/bentristem/learn-to-make-video-games-unreal-developer-course) kickstarter campaign which was over 1000% funded.
 
@@ -17,3 +17,4 @@ Click [here](https://www.udemy.com/unrealcourse?couponCode=GitHubSpecial) to fin
 ## Lecture List
 * BT01 Intro, Notes & Assets
 * BT02 Game Design Document (GDD)
+* BT03 Setting Up a GitHub *Repo"
