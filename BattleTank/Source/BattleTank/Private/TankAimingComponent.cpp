@@ -2,6 +2,8 @@
 
 
 #include "TankAimingComponent.h"
+#include "TankBarrel.h"
+#include <Runtime\Engine\Classes\Kismet\GameplayStatics.h>
 
 // Sets default values for this component's properties
 UTankAimingComponent::UTankAimingComponent()
@@ -13,27 +15,50 @@ UTankAimingComponent::UTankAimingComponent()
 	// ...
 }
 
-
-// Called when the game starts
-void UTankAimingComponent::BeginPlay()
+void UTankAimingComponent::SetBarrelReference(UTankBarrel* BarrelToSet)
 {
-	Super::BeginPlay();
-
-	// ...
-	
+	Barrel = BarrelToSet;
 }
 
 
-// Called every frame
-void UTankAimingComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UTankAimingComponent::AimAt(FVector HitLocation, float LaunchSpeed)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//auto OurTankName = GetOwner()->GetName();
+	//auto BarrelLocation = Barrel->GetComponentLocation().ToString();
+	//UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s from %s"), *OurTankName, *HitLocation.ToString(), *BarrelLocation);
+	if (!Barrel) { return; }
 
-	// ...
+	FVector OutLaunchVelocity;
+	FVector StartLocation = Barrel->GetSocketLocation(FName("Projectile"));
+	//Calculate the OutLaunchVelocity
+	bool bHaveAimSolution = UGameplayStatics::SuggestProjectileVelocity
+	(
+			this,
+			OutLaunchVelocity,
+			StartLocation,
+			HitLocation,
+			LaunchSpeed,			
+			ESuggestProjVelocityTraceOption::DoNotTrace
+			
+	);
+	if (bHaveAimSolution)
+	{
+		auto AimDirection = OutLaunchVelocity.GetSafeNormal();
+		MoveBarrelTowards(AimDirection);
+		//auto TankName = GetOwner()->GetName();
+		//UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *TankName, *AimDirection.ToString());
+	}
+	// If no solution found do nothing
 }
 
-void UTankAimingComponent::AimAt(FVector HitLocation)
+void UTankAimingComponent::MoveBarrelTowards(FVector AimDirection)
 {
-	auto OurTankName = GetOwner()->GetName();
-	UE_LOG(LogTemp, Warning, TEXT("%s aiming at %s"), *OurTankName, *HitLocation.ToString());
+
+	// Work-out difference current barrel reaction, and AimDirection
+	auto BarrelRotation = Barrel->GetForwardVector().Rotation();
+	auto AimAsRotator = AimDirection.Rotation();
+	auto DeltaRotator = AimAsRotator - BarrelRotation;
+	UE_LOG(LogTemp, Warning, TEXT("AimAsRotator: %s"), *AimAsRotator.ToString());
+
+	Barrel->Elevate(5); // TODO remove magic number
 }
